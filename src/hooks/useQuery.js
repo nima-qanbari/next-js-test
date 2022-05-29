@@ -15,6 +15,7 @@ export const useQuery = (fn) => {
         setError(error);
         setLoading(false);
       })
+      
   }, []);
   return { data, error, loading };
 };

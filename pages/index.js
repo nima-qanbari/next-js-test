@@ -1,4 +1,3 @@
-import styles from "../styles/Home.module.css";
 import axios from "axios";
 import Link from "next/link";
 import {
@@ -8,6 +7,8 @@ import {
   Typography,
   CardActions,
 } from "@mui/material";
+
+import { QueryClient, useQuery, dehydrate } from "react-query";
 
 import { makeStyles } from '@mui/styles';
 
@@ -23,15 +24,20 @@ const useStyles = makeStyles(theme => ({
     width: '350px',
   }
 })) 
-export default function Home({ products }) {
+
+
+const getPost = async () => {
+  const response = await axios.get('https://www.tehranservic.com/wp-json/wp/v2/posts')
+   return response.data
+ }
+export default function Home() {
   const classes = useStyles()
 
-  const clickHandler = () => {
+  const {isLoading, error, data, isFetching} = useQuery("post", getPost)
 
-  }
   return (
     <div className={classes.container}>
-      {products.map((item) => {
+      {data.map((item) => {
         return (
           <Card className={classes.card} key={item.id} >
             <CardContent>
@@ -40,7 +46,7 @@ export default function Home({ products }) {
               </Typography>
             </CardContent>
             <CardActions>
-             <Link href={`/post/${item.id}`} >
+             <Link href={`/react-query/${item.id}`} >
              <Button color="primary" variant="contained" component="a">
                 ادامه مطلب
               </Button>
@@ -54,12 +60,12 @@ export default function Home({ products }) {
 }
 
 export async function getServerSideProps() {
-  const response = await axios.get(
-    "https://www.tehranservic.com/wp-json/wp/v2/posts"
-  );
+  const queryClient = new QueryClient()
+
+  await queryClient.prefetchQuery('post', getPost)
   return {
     props: {
-      products: response.data,
+      dehydratedState: dehydrate(queryClient),
     },
   };
 }

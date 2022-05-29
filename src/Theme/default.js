@@ -12,7 +12,8 @@ let theme = createTheme({
   },
   typography: {
       fontFamily:"dana", 
-  }
+  },
+  
 });
 
-export { theme };
+export {theme} ;
